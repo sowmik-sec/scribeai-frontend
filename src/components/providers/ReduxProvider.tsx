@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import type { Persistor } from "redux-persist";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
-import type { Persistor } from "redux-persist";
 
 export default function ReduxProvider({
   children,

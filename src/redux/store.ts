@@ -11,7 +11,6 @@ import {
   REGISTER,
   REHYDRATE,
 } from "redux-persist";
-import { persistStore } from "redux-persist";
 
 const persistConfig = {
   key: "auth",
@@ -38,4 +37,5 @@ export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
 
-export const persistor = persistStore(store);
+// persistor must be created on the client (window) to avoid server-side localStorage access.
+// Create the persistor in a client component (ReduxProvider) using persistStore(store).
