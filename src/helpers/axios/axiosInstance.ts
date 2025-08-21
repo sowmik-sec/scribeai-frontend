@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { authKey } from "@/constants/authKey";
 import { getNewAccessToken } from "@/services/actions/auth.service";
 import setAccessToken from "@/services/actions/setAccessToken";
@@ -30,7 +29,7 @@ instance.interceptors.request.use(
 
 // Add a response interceptor
 instance.interceptors.response.use(
-  //@ts-expect-error
+  //@ts-expect-error response typing issue
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
