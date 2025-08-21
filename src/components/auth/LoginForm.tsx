@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,9 +16,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { storeUserInfo } from "@/services/actions/auth.service";
+import { userLogin } from "@/services/actions/userLogin";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -33,32 +34,26 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-
-  const [login, { isLoading }] = useLoginMutation();
-  const router = useRouter();
+  const [error, setError] = useState("");
 
   async function onSubmit(values: LoginFormValues) {
     try {
-      // console.log(values);
-      // TODO: handle success (redirect, toast, set user)
-
-      const result = await login({
-        email: values.email,
-        password: values.password,
-      }).unwrap();
-      if (result.success) {
-        toast.success("Thank you for signing up in Scribeai");
-        router.push("/dashboard");
+      const res = await userLogin(values);
+      if (res?.data?.accessToken) {
+        storeUserInfo({ accessToken: res.data.accessToken });
+        toast.success("User logged in successfully");
+        // router.push("/dashboard");
+      } else {
+        setError(res.message);
       }
-
-      // console.log("signup success", result);
-    } catch (err) {
-      console.error("signup error", err);
+    } catch (error: any) {
+      console.error(error.message);
     }
   }
 
   return (
     <div className="min-h-[100vh] flex items-center justify-center px-4">
+      <Toaster position="top-center" />
       <div className="max-w-md w-full bg-white/60 backdrop-blur rounded-2xl shadow-lg border border-gray-200 dark:bg-slate-900/60 dark:border-slate-700 p-8">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold">Login your account</h1>
@@ -116,11 +111,11 @@ export default function LoginForm() {
                   "focus-visible:ring-4 focus-visible:ring-indigo-300/40",
                   "disabled:opacity-60 disabled:cursor-not-allowed"
                 )}
-                disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Log in"}
+                Login
               </Button>
             </div>
+            <div className="pt-2 text-red-500 text-sm">{error}</div>
 
             <div className="text-center mt-3 text-sm">
               <span className="text-muted-foreground">New to Scribeai? </span>
